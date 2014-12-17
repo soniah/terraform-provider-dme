@@ -3,8 +3,9 @@
 [![Build
 Status](https://travis-ci.org/soniah/terraform-provider-dme.svg?branch=master)](https://travis-ci.org/soniah/terraform-provider-dme)
 [![GoDoc](https://godoc.org/github.com/soniah/terraform-provider-dme?status.png)](http://godoc.org/github.com/soniah/terraform-provider-dme)
+https://github.com/soniah/terraform-provider-dme v0.2
 
-A [DNSMadeEasy](http://www.dnsmadeeasy.com/) provider for Terraform.
+A [DNSMadeEasy](http://www.dnsmadeeasy.com/) provider for [Terraform](https://github.com/hashicorp/terraform).
 
 This is an early release and the software should be considered 'barely
 working':
@@ -29,6 +30,23 @@ Sonia Hamilton, sonia@snowfrog.net, http://blog.snowfrog.net.
 
 * follow the instructions for **Installing a Plugin** detailed in
   [Plugin Basics](https://www.terraform.io/docs/plugins/basics.html)
+
+* to run the tests:
+
+```shell
+% export TF_ACC=1
+% export DME_AKEY=aaaaaa1a-11a1-1aa1-a101-11a1a11aa1a
+% export DME_SKEY=11a0a11a-a1a1-111a-a11a-a11110a11111
+% export DME_DOMAINID=123456
+% export DME_USESANDBOX='true'
+% go test -v
+```
+
+* wireshark filter:
+
+```shell
+host 208.94.147.116
+```
 
 ## Usage
 

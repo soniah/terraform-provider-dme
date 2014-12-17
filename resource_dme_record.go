@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	dme "github.com/soniah/dnsmadeeasy"
@@ -17,19 +16,11 @@ func resourceDMERecord() *schema.Resource {
 		Delete: resourceDMERecordDelete,
 
 		Schema: map[string]*schema.Schema{
-
+			// Use recordid for TF ID.
 			"domainid": &schema.Schema{
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Required: true,
 			},
-			/*
-				Use recordid for TF ID.
-				"recordid": &schema.Schema{
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-			*/
-
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -120,7 +111,9 @@ func resourceDMERecord() *schema.Resource {
 
 func resourceDMERecordCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*dme.Client)
-	log.Printf("[INFO] Creating record for domainid: %d", d.Get("domainid").(int))
+
+	domainid := d.Get("domainid").(string)
+	log.Printf("[INFO] Creating record for domainid: %s", domainid)
 
 	cr := map[string]interface{}{
 		"name":  d.Get("name").(string),
@@ -130,25 +123,24 @@ func resourceDMERecordCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 	log.Printf("[DEBUG] record create configuration: %#v", cr)
 
-	domainid := int64(d.Get("domainid").(int))
 	result, err := client.CreateRecord(domainid, cr)
 	if err != nil {
 		return fmt.Errorf("Failed to create record: %s", err)
 	}
-	d.SetId(strconv.FormatInt(result, 10))
+
+	d.SetId(result)
 	log.Printf("[INFO] record ID: %s", d.Id())
+
 	return resourceDMERecordRead(d, meta)
 }
 
 func resourceDMERecordRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*dme.Client)
-	recordid, err2 := strconv.ParseInt(d.Id(), 10, 64)
-	if err2 != nil {
-		return fmt.Errorf("Error converting d.Id(): %s", err2)
-	}
-	log.Printf("[INFO] Reading record for domainid: %d recordid: %d", d.Get("domainid").(int), recordid)
 
-	domainid := int64(d.Get("domainid").(int))
+	domainid := d.Get("domainid").(string)
+	recordid := d.Id()
+	log.Printf("[INFO] Reading record for domainid: %s recordid: %s", domainid, recordid)
+
 	rec, err := client.ReadRecord(domainid, recordid)
 	if err != nil {
 		return fmt.Errorf("Couldn't find record: %s", err)
@@ -164,11 +156,9 @@ func resourceDMERecordRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceDMERecordUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*dme.Client)
-	domainid := int64(d.Get("domainid").(int))
-	recordid, err := strconv.ParseInt(d.Id(), 10, 64)
-	if err != nil {
-		return fmt.Errorf("Error converting d.Id(): %s", err)
-	}
+
+	domainid := d.Get("domainid").(string)
+	recordid := d.Id()
 
 	cr := make(map[string]interface{})
 	if attr, ok := d.GetOk("name"); ok {
@@ -184,24 +174,24 @@ func resourceDMERecordUpdate(d *schema.ResourceData, meta interface{}) error {
 		cr["TTL"] = int64(attr.(int))
 	}
 	log.Printf("[DEBUG] record update configuration: %+#v", cr)
-	if _, err2 := client.UpdateRecord(domainid, recordid, cr); err2 != nil {
+
+	if _, err := client.UpdateRecord(domainid, recordid, cr); err != nil {
 		return fmt.Errorf("Error updating record: %s", err)
 	}
+
 	return resourceDMERecordRead(d, meta)
 }
 
 func resourceDMERecordDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*dme.Client)
-	domainid := int64(d.Get("domainid").(int))
-	recordid, err := strconv.ParseInt(d.Id(), 10, 64)
-	if err != nil {
-		return fmt.Errorf("Error converting d.Id(): %s", err)
-	}
 
-	log.Printf("[INFO] Deleting record for domainid: %d recordid: %d", domainid, recordid)
+	domainid := d.Get("domainid").(string)
+	recordid := d.Id()
+	log.Printf("[INFO] Deleting record for domainid: %s recordid: %s", domainid, recordid)
 
-	if err2 := client.DeleteRecord(domainid, recordid); err2 != nil {
+	if err := client.DeleteRecord(domainid, recordid); err != nil {
 		return fmt.Errorf("Error deleting record: %s", err)
 	}
+
 	return nil
 }

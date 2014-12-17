@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"os"
 )
 
 // Provider provides a Provider...
