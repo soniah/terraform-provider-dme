@@ -13,23 +13,6 @@ import (
 var _ = fmt.Sprintf("dummy") // dummy
 var _ = os.DevNull           // dummy
 
-/*
-		Check: resource.ComposeTestCheckFunc(
-			testAccCheckDMERecordExists("dme_record.test", &record),
-			resource.TestCheckResourceAttr(
-				"dme_record.test", "domainid", domainid),
-			resource.TestCheckResourceAttr(
-				"dme_record.test", "name", "test"),
-			resource.TestCheckResourceAttr(
-				"dme_record.test", "type", "A"),
-			resource.TestCheckResourceAttr(
-				"dme_record.test", "value", "1.1.1.2"),
-			resource.TestCheckResourceAttr(
-				"dme_record.test", "ttl", "2000"),
-		),
-	},
-*/
-
 func TestAccDMERecordA(t *testing.T) {
 	var record dme.Record
 	domainid := os.Getenv("DME_DOMAINID")
