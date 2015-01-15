@@ -29,11 +29,40 @@ func TestAccDMERecordA(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "domainid", domainid),
 					resource.TestCheckResourceAttr(
-						"dme_record.test", "name", "test"),
+						"dme_record.test", "name", "testa"),
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "type", "A"),
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "value", "1.1.1.1"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDMERecordCName(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigCName, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testcname"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "CNAME"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "foo"),
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "ttl", "2000"),
 				),
@@ -94,8 +123,17 @@ func testAccCheckDMERecordExists(n string, record *dme.Record) resource.TestChec
 const testDMERecordConfigA = `
 resource "dme_record" "test" {
   domainid = "%s"
-  name = "test"
+  name = "testa"
   type = "A"
   value = "1.1.1.1"
+  ttl = 2000
+}`
+
+const testDMERecordConfigCName = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testcname"
+  type = "CNAME"
+  value = "foo"
   ttl = 2000
 }`

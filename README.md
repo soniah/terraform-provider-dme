@@ -3,18 +3,17 @@
 [![Build
 Status](https://travis-ci.org/soniah/terraform-provider-dme.svg?branch=master)](https://travis-ci.org/soniah/terraform-provider-dme)
 [![GoDoc](https://godoc.org/github.com/soniah/terraform-provider-dme?status.png)](http://godoc.org/github.com/soniah/terraform-provider-dme)
-https://github.com/soniah/terraform-provider-dme v0.2
+https://github.com/soniah/terraform-provider-dme v0.3
 
 A [DNSMadeEasy](http://www.dnsmadeeasy.com/) provider for [Terraform](https://github.com/hashicorp/terraform).
 
-This is an early release and the software should be considered 'barely
+This is an early release and the software should be considered 'just
 working':
 
-* only A records are handled
-* almost no tests or documentation
-* code needs to be refactored and tidied
+* only A, CName records are handled
+* sparse documentation and more tests required
 
-Sonia Hamilton, sonia@snowfrog.net, http://blog.snowfrog.net.
+Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
 
 ![Terraform](https://raw.githubusercontent.com/hashicorp/terraform/master/website/source/assets/images/readme.png)
 
@@ -59,11 +58,19 @@ provider "dme" {
   usesandbox = true
 }
 
-resource "dme_record" "test" {
+resource "dme_record" "testa" {
   domainid = "123456"
-  name = "test1"
+  name = "testa"
   type = "A"
   value = "1.1.1.1"
+  ttl = 1000
+}
+
+resource "dme_record" "testcname" {
+  domainid = "123456"
+  name = "testcname"
+  type = "CNAME"
+  value = "foo"
   ttl = 1000
 }
 ```

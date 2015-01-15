@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	dme "github.com/soniah/dnsmadeeasy"
@@ -115,13 +116,11 @@ func resourceDMERecordCreate(d *schema.ResourceData, meta interface{}) error {
 	domainid := d.Get("domainid").(string)
 	log.Printf("[INFO] Creating record for domainid: %s", domainid)
 
-	cr := map[string]interface{}{
-		"name":  d.Get("name").(string),
-		"type":  d.Get("type").(string),
-		"value": d.Get("value").(string),
-		"ttl":   int64(d.Get("ttl").(int)),
+	cr := make(map[string]interface{})
+	if err := getAll(d, cr); err != nil {
+		return err
 	}
-	log.Printf("[DEBUG] record create configuration: %#v", cr)
+	log.Printf("[DEBUG] xyzzy record create configuration: %#v", cr)
 
 	result, err := client.CreateRecord(domainid, cr)
 	if err != nil {
@@ -146,12 +145,7 @@ func resourceDMERecordRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Couldn't find record: %s", err)
 	}
 
-	d.Set("name", rec.Name)
-	d.Set("type", rec.Type)
-	d.Set("value", rec.Value)
-	d.Set("ttl", rec.TTL)
-
-	return nil
+	return setAll(d, rec)
 }
 
 func resourceDMERecordUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -161,19 +155,10 @@ func resourceDMERecordUpdate(d *schema.ResourceData, meta interface{}) error {
 	recordid := d.Id()
 
 	cr := make(map[string]interface{})
-	if attr, ok := d.GetOk("name"); ok {
-		cr["Name"] = attr.(string)
+	if err := getAll(d, cr); err != nil {
+		return err
 	}
-	if attr, ok := d.GetOk("type"); ok {
-		cr["Type"] = attr.(string)
-	}
-	if attr, ok := d.GetOk("value"); ok {
-		cr["Value"] = attr.(string)
-	}
-	if attr, ok := d.GetOk("ttl"); ok {
-		cr["TTL"] = int64(attr.(int))
-	}
-	log.Printf("[DEBUG] record update configuration: %+#v", cr)
+	log.Printf("[DEBUG] xyzzy record update configuration: %+#v", cr)
 
 	if _, err := client.UpdateRecord(domainid, recordid, cr); err != nil {
 		return fmt.Errorf("Error updating record: %s", err)
@@ -193,5 +178,41 @@ func resourceDMERecordDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error deleting record: %s", err)
 	}
 
+	return nil
+}
+
+func getAll(d *schema.ResourceData, cr map[string]interface{}) error {
+
+	switch strings.ToUpper(d.Get("type").(string)) {
+	case "A", "CNAME":
+		if attr, ok := d.GetOk("name"); ok {
+			cr["name"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("type"); ok {
+			cr["type"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("value"); ok {
+			cr["value"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("ttl"); ok {
+			cr["ttl"] = int64(attr.(int))
+		}
+	default:
+		return fmt.Errorf("getAll: type not found")
+	}
+	return nil
+}
+
+func setAll(d *schema.ResourceData, rec *dme.Record) error {
+	d.Set("type", rec.Type)
+	d.Set("name", rec.Name)
+
+	switch rec.Type {
+	case "A", "CNAME":
+		d.Set("value", rec.Value)
+		d.Set("ttl", rec.TTL)
+	default:
+		return fmt.Errorf("getAll: type not found")
+	}
 	return nil
 }
