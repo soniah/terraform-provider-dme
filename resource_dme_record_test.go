@@ -191,6 +191,35 @@ func TestAccDMERecordSPF(t *testing.T) {
 	})
 }
 
+func TestAccDMERecordPTR(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigPTR, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testptr"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "PTR"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "foo"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccDMERecordNS(t *testing.T) {
 	var record dme.Record
 	domainid := os.Getenv("DME_DOMAINID")
@@ -212,6 +241,70 @@ func TestAccDMERecordNS(t *testing.T) {
 						"dme_record.test", "type", "NS"),
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "value", "foo"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDMERecordAAAA(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigAAAA, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testaaaa"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "AAAA"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "fe80::0202:b3ff:fe1e:8329"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDMERecordSRV(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigSRV, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testsrv"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "SRV"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "foo"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "priority", "10"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "weight", "20"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "port", "30"),
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "ttl", "2000"),
 				),
@@ -324,11 +417,41 @@ resource "dme_record" "test" {
   ttl = 2000
 }`
 
+const testDMERecordConfigPTR = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testptr"
+  type = "PTR"
+  value = "foo"
+  ttl = 2000
+}`
+
 const testDMERecordConfigNS = `
 resource "dme_record" "test" {
   domainid = "%s"
   name = "testns"
   type = "NS"
   value = "foo"
+  ttl = 2000
+}`
+
+const testDMERecordConfigAAAA = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testaaaa"
+  type = "AAAA"
+  value = "FE80::0202:B3FF:FE1E:8329"
+  ttl = 2000
+}`
+
+const testDMERecordConfigSRV = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testsrv"
+  type = "SRV"
+  value = "foo"
+  priority = 10
+  weight = 20
+  port = 30
   ttl = 2000
 }`
