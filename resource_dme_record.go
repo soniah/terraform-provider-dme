@@ -44,6 +44,18 @@ func resourceDMERecord() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"weight": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"priority": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"port": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 
 			/*
 				"source": &schema.Schema{
@@ -92,18 +104,6 @@ func resourceDMERecord() *schema.Resource {
 				},
 				"hardlink": &schema.Schema{
 					Type:     schema.TypeBool,
-					Optional: true,
-				},
-				"weight": &schema.Schema{
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-				"priority": &schema.Schema{
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-				"port": &schema.Schema{
-					Type:     schema.TypeInt,
 					Optional: true,
 				},
 			*/
@@ -184,35 +184,40 @@ func resourceDMERecordDelete(d *schema.ResourceData, meta interface{}) error {
 
 func getAll(d *schema.ResourceData, cr map[string]interface{}) error {
 
+	if attr, ok := d.GetOk("name"); ok {
+		cr["name"] = attr.(string)
+	}
+	if attr, ok := d.GetOk("type"); ok {
+		cr["type"] = attr.(string)
+	}
+	if attr, ok := d.GetOk("ttl"); ok {
+		cr["ttl"] = int64(attr.(int))
+	}
+
 	switch strings.ToUpper(d.Get("type").(string)) {
-	case "A", "CNAME", "ANAME", "TXT", "SPF", "NS":
-		if attr, ok := d.GetOk("name"); ok {
-			cr["name"] = attr.(string)
-		}
-		if attr, ok := d.GetOk("type"); ok {
-			cr["type"] = attr.(string)
-		}
+	case "A", "CNAME", "ANAME", "TXT", "SPF", "NS", "PTR", "AAAA":
 		if attr, ok := d.GetOk("value"); ok {
 			cr["value"] = attr.(string)
 		}
-		if attr, ok := d.GetOk("ttl"); ok {
-			cr["ttl"] = int64(attr.(int))
-		}
 	case "MX":
-		if attr, ok := d.GetOk("name"); ok {
-			cr["name"] = attr.(string)
-		}
-		if attr, ok := d.GetOk("type"); ok {
-			cr["type"] = attr.(string)
-		}
 		if attr, ok := d.GetOk("value"); ok {
 			cr["value"] = attr.(string)
 		}
 		if attr, ok := d.GetOk("mxLevel"); ok {
 			cr["mxLevel"] = int64(attr.(int))
 		}
-		if attr, ok := d.GetOk("ttl"); ok {
-			cr["ttl"] = int64(attr.(int))
+	case "SRV":
+		if attr, ok := d.GetOk("value"); ok {
+			cr["value"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("priority"); ok {
+			cr["priority"] = int64(attr.(int))
+		}
+		if attr, ok := d.GetOk("weight"); ok {
+			cr["weight"] = int64(attr.(int))
+		}
+		if attr, ok := d.GetOk("port"); ok {
+			cr["port"] = int64(attr.(int))
 		}
 	default:
 		return fmt.Errorf("getAll: type not found")
@@ -223,15 +228,21 @@ func getAll(d *schema.ResourceData, cr map[string]interface{}) error {
 func setAll(d *schema.ResourceData, rec *dme.Record) error {
 	d.Set("type", rec.Type)
 	d.Set("name", rec.Name)
+	d.Set("ttl", rec.TTL)
 
 	switch rec.Type {
-	case "A", "CNAME", "ANAME", "TXT", "SPF", "NS":
+	case "A", "CNAME", "ANAME", "TXT", "SPF", "NS", "PTR":
 		d.Set("value", rec.Value)
-		d.Set("ttl", rec.TTL)
+	case "AAAA":
+		d.Set("value", strings.ToLower(rec.Value))
 	case "MX":
 		d.Set("value", rec.Value)
 		d.Set("mxLevel", rec.MXLevel)
-		d.Set("ttl", rec.TTL)
+	case "SRV":
+		d.Set("value", rec.Value)
+		d.Set("priority", rec.Priority)
+		d.Set("weight", rec.Weight)
+		d.Set("port", rec.Port)
 	default:
 		return fmt.Errorf("setAll: type not found")
 	}
