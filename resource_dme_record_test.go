@@ -71,6 +71,155 @@ func TestAccDMERecordCName(t *testing.T) {
 	})
 }
 
+/*
+func TestAccDMERecordAName(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigAName, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testaname"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "ANAME"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "foo"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+*/
+
+func TestAccDMERecordMX(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigMX, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testmx"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "MX"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "foo"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "mxLevel", "10"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDMERecordTXT(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigTXT, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testtxt"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "TXT"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "\"foo\""),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDMERecordSPF(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigSPF, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testspf"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "SPF"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "\"foo\""),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDMERecordNS(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigNS, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testns"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "NS"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "foo"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckDMERecordDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*dme.Client)
 
@@ -134,6 +283,52 @@ resource "dme_record" "test" {
   domainid = "%s"
   name = "testcname"
   type = "CNAME"
+  value = "foo"
+  ttl = 2000
+}`
+
+const testDMERecordConfigAName = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testaname"
+  type = "ANAME"
+  value = "foo"
+  ttl = 2000
+}`
+
+const testDMERecordConfigMX = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testmx"
+  type = "MX"
+  value = "foo"
+  mxLevel = 10
+  ttl = 2000
+}`
+
+const testDMERecordConfigTXT = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testtxt"
+  type = "TXT"
+  value = "foo"
+  ttl = 2000
+}`
+
+const testDMERecordConfigSPF = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testspf"
+  type = "SPF"
+  value = "foo"
+  ttl = 2000
+}`
+
+const testDMERecordConfigNS = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testns"
+  type = "NS"
   value = "foo"
   ttl = 2000
 }`

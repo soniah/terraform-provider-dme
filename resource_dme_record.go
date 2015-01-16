@@ -40,6 +40,11 @@ func resourceDMERecord() *schema.Resource {
 				Optional: true,
 			},
 
+			"mxLevel": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+
 			/*
 				"source": &schema.Schema{
 					Type:     schema.TypeInt,
@@ -87,10 +92,6 @@ func resourceDMERecord() *schema.Resource {
 				},
 				"hardlink": &schema.Schema{
 					Type:     schema.TypeBool,
-					Optional: true,
-				},
-				"mxlevel": &schema.Schema{
-					Type:     schema.TypeInt,
 					Optional: true,
 				},
 				"weight": &schema.Schema{
@@ -184,7 +185,7 @@ func resourceDMERecordDelete(d *schema.ResourceData, meta interface{}) error {
 func getAll(d *schema.ResourceData, cr map[string]interface{}) error {
 
 	switch strings.ToUpper(d.Get("type").(string)) {
-	case "A", "CNAME":
+	case "A", "CNAME", "ANAME", "TXT", "SPF", "NS":
 		if attr, ok := d.GetOk("name"); ok {
 			cr["name"] = attr.(string)
 		}
@@ -193,6 +194,22 @@ func getAll(d *schema.ResourceData, cr map[string]interface{}) error {
 		}
 		if attr, ok := d.GetOk("value"); ok {
 			cr["value"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("ttl"); ok {
+			cr["ttl"] = int64(attr.(int))
+		}
+	case "MX":
+		if attr, ok := d.GetOk("name"); ok {
+			cr["name"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("type"); ok {
+			cr["type"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("value"); ok {
+			cr["value"] = attr.(string)
+		}
+		if attr, ok := d.GetOk("mxLevel"); ok {
+			cr["mxLevel"] = int64(attr.(int))
 		}
 		if attr, ok := d.GetOk("ttl"); ok {
 			cr["ttl"] = int64(attr.(int))
@@ -208,11 +225,15 @@ func setAll(d *schema.ResourceData, rec *dme.Record) error {
 	d.Set("name", rec.Name)
 
 	switch rec.Type {
-	case "A", "CNAME":
+	case "A", "CNAME", "ANAME", "TXT", "SPF", "NS":
 		d.Set("value", rec.Value)
 		d.Set("ttl", rec.TTL)
+	case "MX":
+		d.Set("value", rec.Value)
+		d.Set("mxLevel", rec.MXLevel)
+		d.Set("ttl", rec.TTL)
 	default:
-		return fmt.Errorf("getAll: type not found")
+		return fmt.Errorf("setAll: type not found")
 	}
 	return nil
 }

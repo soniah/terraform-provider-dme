@@ -3,14 +3,14 @@
 [![Build
 Status](https://travis-ci.org/soniah/terraform-provider-dme.svg?branch=master)](https://travis-ci.org/soniah/terraform-provider-dme)
 [![GoDoc](https://godoc.org/github.com/soniah/terraform-provider-dme?status.png)](http://godoc.org/github.com/soniah/terraform-provider-dme)
-https://github.com/soniah/terraform-provider-dme v0.3
+https://github.com/soniah/terraform-provider-dme v0.4
 
 A [DNSMadeEasy](http://www.dnsmadeeasy.com/) provider for [Terraform](https://github.com/hashicorp/terraform).
 
 This is an early release and the software should be considered 'just
 working':
 
-* only A, CName records are handled
+* only A, CName, MX, TXT, SPF, NS records are handled
 * sparse documentation and more tests required
 
 Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
@@ -70,6 +70,30 @@ resource "dme_record" "testcname" {
   domainid = "123456"
   name = "testcname"
   type = "CNAME"
+  value = "foo"
+  ttl = 1000
+}
+
+resource "dme_record" "testtxt" {
+  domainid = "123456"
+  name = "testtxt"
+  type = "TXT"
+  value = "foo"
+  ttl = 1000
+}
+
+resource "dme_record" "testspf" {
+  domainid = "123456"
+  name = "testspf"
+  type = "SPF"
+  value = "foo"
+  ttl = 1000
+}
+
+resource "dme_record" "testns" {
+  domainid = "123456"
+  name = "testns"
+  type = "NS"
   value = "foo"
   ttl = 1000
 }
