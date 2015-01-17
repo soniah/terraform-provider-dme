@@ -18,7 +18,7 @@ Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
 
 ## Installation
 
-* Travis shows that this project builds on Go 1.2, 1.3, but not 1.0 or 1.4
+* this project only builds on Go 1.4
 
 * install the [Terraform](https://github.com/hashicorp/terraform)
   development environment, build it using the **Development Environment**
@@ -28,23 +28,6 @@ Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
 
 * follow the instructions for **Installing a Plugin** detailed in
   [Plugin Basics](https://www.terraform.io/docs/plugins/basics.html)
-
-* to run the tests:
-
-```shell
-% export TF_ACC=1
-% export DME_AKEY=aaaaaa1a-11a1-1aa1-a101-11a1a11aa1a
-% export DME_SKEY=11a0a11a-a1a1-111a-a11a-a11110a11111
-% export DME_DOMAINID=123456
-% export DME_USESANDBOX='true'
-% go test -v
-```
-
-* wireshark filter:
-
-```shell
-host 208.94.147.116
-```
 
 ## Usage
 
@@ -153,9 +136,24 @@ resource "dme_record" "testsrv" {
 
 ```
 
-## Documentation
+## Tests
 
-The full documentation is available on [Godoc](http://godoc.org/github.com/soniah/dnsmadeeasy)
+To run the tests:
+
+```shell
+% export TF_ACC=1
+% export DME_AKEY=aaaaaa1a-11a1-1aa1-a101-11a1a11aa1a
+% export DME_SKEY=11a0a11a-a1a1-111a-a11a-a11110a11111
+% export DME_DOMAINID=123456
+% export DME_USESANDBOX='true'
+% go test -v
+```
+
+* wireshark filter:
+
+```shell
+host 208.94.147.116
+```
 
 ## Related Projects
 
