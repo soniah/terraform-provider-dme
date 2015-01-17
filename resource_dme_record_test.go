@@ -72,6 +72,10 @@ func TestAccDMERecordCName(t *testing.T) {
 }
 
 /*
+
+ANAME can't be tested under sandbox, as the value of the ANAME must be a
+resolvable address.
+
 func TestAccDMERecordAName(t *testing.T) {
 	var record dme.Record
 	domainid := os.Getenv("DME_DOMAINID")
@@ -125,6 +129,47 @@ func TestAccDMERecordMX(t *testing.T) {
 						"dme_record.test", "value", "foo"),
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "mxLevel", "10"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "ttl", "2000"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDMERecordHTTPRED(t *testing.T) {
+	var record dme.Record
+	domainid := os.Getenv("DME_DOMAINID")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDMERecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: fmt.Sprintf(testDMERecordConfigHTTPRED, domainid),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDMERecordExists("dme_record.test", &record),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "domainid", domainid),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "name", "testhttpred"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "type", "HTTPRED"),
+
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "value", "https://github.com/soniah/terraform-provider-dme"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "hardLink", "true"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "redirectType", "Hidden Frame Masked"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "title", "An Example"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "keywords", "terraform example"),
+					resource.TestCheckResourceAttr(
+						"dme_record.test", "description", "This is a description"),
+
 					resource.TestCheckResourceAttr(
 						"dme_record.test", "ttl", "2000"),
 				),
@@ -396,6 +441,20 @@ resource "dme_record" "test" {
   type = "MX"
   value = "foo"
   mxLevel = 10
+  ttl = 2000
+}`
+
+const testDMERecordConfigHTTPRED = `
+resource "dme_record" "test" {
+  domainid = "%s"
+  name = "testhttpred"
+  type = "HTTPRED"
+  value = "https://github.com/soniah/terraform-provider-dme"
+  hardLink = true
+  redirectType = "Hidden Frame Masked"
+  title = "An Example"
+  keywords = "terraform example"
+  description = "This is a description"
   ttl = 2000
 }`
 

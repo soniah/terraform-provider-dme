@@ -3,14 +3,14 @@
 [![Build
 Status](https://travis-ci.org/soniah/terraform-provider-dme.svg?branch=master)](https://travis-ci.org/soniah/terraform-provider-dme)
 [![GoDoc](https://godoc.org/github.com/soniah/terraform-provider-dme?status.png)](http://godoc.org/github.com/soniah/terraform-provider-dme)
-https://github.com/soniah/terraform-provider-dme v0.5
+https://github.com/soniah/terraform-provider-dme v0.7
 
 A [DNSMadeEasy](http://www.dnsmadeeasy.com/) provider for [Terraform](https://github.com/hashicorp/terraform).
 
-This software is still under development:
-
-* all records except ANAME and HTTPRED are implemented
-* sparse documentation and more tests required
+This software is still under development -- it's fully featured but more
+tests may be required. It provides support for adding and removing
+records on existing domains; to add/remove domains or for other
+DNSMadeEasy functionality you'll need to use the web interface.
 
 Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
 
@@ -18,7 +18,8 @@ Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
 
 ## Installation
 
-* this project only builds on Go 1.4
+* this project builds on Go 1.2, 1.3 and 1.4, however Terraform itself
+  only builds on Go 1.4
 
 * install the [Terraform](https://github.com/hashicorp/terraform)
   development environment, build it using the **Development Environment**
@@ -30,12 +31,6 @@ Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
   [Plugin Basics](https://www.terraform.io/docs/plugins/basics.html)
 
 ## Usage
-
-The project provides support for adding and removing records
-on existing domains. To add/remove domains or for other
-DNSMadeEasy functionality you'll need to use the web
-interface.
-
 
 Here is an example `test.tf` file. Note that domainid is a
 string, and other integer values are integers.
@@ -67,6 +62,15 @@ resource "dme_record" "testcname" {
   ttl = 1000
 }
 
+# ANAME record
+resource "dme_record" "testaname" {
+  domainid = "123456"
+  name = "testaname"
+  type = "ANAME"
+  value = "foo"
+  ttl = 1000
+}
+
 # MX record
 resource "dme_record" "testmx" {
   domainid = "123456"
@@ -75,6 +79,20 @@ resource "dme_record" "testmx" {
   value = "foo"
   mxLevel = 10
   ttl = 1000
+}
+
+# HTTPRED
+resource "dme_record" "testhttpred" {
+  domainid = "123456"
+  name = "testhttpred"
+  type = "HTTPRED"
+  value = "https://github.com/soniah/terraform-provider-dme"
+  hardLink = true
+  redirectType = "Hidden Frame Masked"
+  title = "An Example"
+  keywords = "terraform example"
+  description = "This is a description"
+  ttl = 2000
 }
 
 # TXT record
