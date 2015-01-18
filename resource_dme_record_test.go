@@ -366,7 +366,6 @@ func testAccCheckDMERecordDestroy(s *terraform.State) error {
 			continue
 		}
 
-		fmt.Printf("rs: %+v")
 		_, err := client.ReadRecord(rs.Primary.Attributes["domainid"], rs.Primary.ID)
 
 		if err == nil {
