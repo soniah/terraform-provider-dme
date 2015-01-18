@@ -7,8 +7,8 @@ https://github.com/soniah/terraform-provider-dme v0.7
 
 A [DNSMadeEasy](http://www.dnsmadeeasy.com/) provider for [Terraform](https://github.com/hashicorp/terraform).
 
-This software is still under development -- it's fully featured but more
-tests may be required. It provides support for adding and removing
+This is the first release of the software -- it's fully featured but
+more tests may be required. It provides support for adding and removing
 records on existing domains; to add/remove domains or for other
 DNSMadeEasy functionality you'll need to use the web interface.
 
@@ -18,8 +18,7 @@ Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
 
 ## Installation
 
-* this project builds on Go 1.2, 1.3 and 1.4, however Terraform itself
-  only builds on Go 1.4
+* Terraform requires Go1.4 to build
 
 * install the [Terraform](https://github.com/hashicorp/terraform)
   development environment, build it using the **Development Environment**

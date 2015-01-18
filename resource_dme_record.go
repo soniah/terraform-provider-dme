@@ -74,41 +74,6 @@ func resourceDMERecord() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
-			/*
-				"source": &schema.Schema{
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-				"sourceid": &schema.Schema{
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-				"dynamicdns": &schema.Schema{
-					Type:     schema.TypeBool,
-					Optional: true,
-				},
-				"password": &schema.Schema{
-					Type:     schema.TypeString,
-					Optional: true,
-				},
-				"monitor": &schema.Schema{
-					Type:     schema.TypeBool,
-					Optional: true,
-				},
-				"failover": &schema.Schema{
-					Type:     schema.TypeBool,
-					Optional: true,
-				},
-				"failed": &schema.Schema{
-					Type:     schema.TypeBool,
-					Optional: true,
-				},
-				"gtdlocation": &schema.Schema{
-					Type:     schema.TypeString,
-					Optional: true,
-				},
-			*/
 		},
 	}
 }
@@ -123,7 +88,7 @@ func resourceDMERecordCreate(d *schema.ResourceData, meta interface{}) error {
 	if err := getAll(d, cr); err != nil {
 		return err
 	}
-	log.Printf("[DEBUG] xyzzy record create configuration: %#v", cr)
+	log.Printf("[DEBUG] record create configuration: %#v", cr)
 
 	result, err := client.CreateRecord(domainid, cr)
 	if err != nil {
@@ -161,7 +126,7 @@ func resourceDMERecordUpdate(d *schema.ResourceData, meta interface{}) error {
 	if err := getAll(d, cr); err != nil {
 		return err
 	}
-	log.Printf("[DEBUG] xyzzy record update configuration: %+#v", cr)
+	log.Printf("[DEBUG] record update configuration: %+#v", cr)
 
 	if _, err := client.UpdateRecord(domainid, recordid, cr); err != nil {
 		return fmt.Errorf("Error updating record: %s", err)
