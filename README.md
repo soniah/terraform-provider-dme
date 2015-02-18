@@ -22,11 +22,14 @@ Sonia Hamilton sonia@snowfrog.net http://blog.snowfrog.net
 
 * install the [Terraform](https://github.com/hashicorp/terraform)
   development environment, build it using the **Development Environment**
-  instructions
+  instructions. The dev environment build will place the binaries in
+  `$GOPATH/src/github.com/hashicorp/terraform/bin`.  Copy these files to
+  somewhere in your $PATH eg `/usr/local/bin`.
 
-* install this project via `go get github.com/soniah/terraform-provider-dme`
-
-* follow the instructions for **Installing a Plugin** detailed in
+* install this project via `go get github.com/soniah/terraform-provider-dme`. This
+  will place the `terraform-provider-dme` binary in `$GOPATH/bin`. Copy
+  this file to somewhere in your $PATH eg `/usr/local/bin`. (These are
+  the instructions for **Installing a Plugin** detailed in
   [Plugin Basics](https://www.terraform.io/docs/plugins/basics.html)
 
 ## Usage
