@@ -1,5 +1,7 @@
 # terraform-provider-dme
 
+**26-Feb-2015** _This has now been merged into the Terraform development mainline; this project is kept here for reference. Until it is merged into Terraform release, build manually using the instructions below._
+
 [![Build
 Status](https://travis-ci.org/soniah/terraform-provider-dme.svg?branch=master)](https://travis-ci.org/soniah/terraform-provider-dme)
 [![GoDoc](https://godoc.org/github.com/soniah/terraform-provider-dme?status.png)](http://godoc.org/github.com/soniah/terraform-provider-dme)
